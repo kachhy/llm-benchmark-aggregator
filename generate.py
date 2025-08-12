@@ -5,7 +5,7 @@ import pandas as pd
 import sys
 
 LOW_RUN_THRES  = 20 # The minimum number of test runs a test can be used for
-LOW_TEST_THRES = 3 # The minimum number of test cases a model must have to be included
+LOW_TEST_THRES = 4 # The minimum number of test cases a model must have to be included
 
 def main() -> None:
     if len(sys.argv) < 2:
@@ -63,7 +63,8 @@ def main() -> None:
     result = sorted(average_test_scores, key=average_test_scores.get, reverse=True)
 
     for model in result:
-        print(model, round(average_test_scores[model] * 100, 1))
+        ats = round(average_test_scores[model] * 100, 1)
+        print(f'{model:<38} {ats:<3}')
 
 if __name__ == "__main__":
     main()
