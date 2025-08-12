@@ -4,6 +4,9 @@
 import pandas as pd
 import sys
 
+LOW_RUN_THRES  = 20 # The minimum number of test runs a test can be used for
+LOW_TEST_THRES = 3 # The minimum number of test cases a model must have to be included
+
 def main() -> None:
     if len(sys.argv) < 2:
         print("Usage: python3 generate.py <input CSV>")
@@ -14,6 +17,8 @@ def main() -> None:
     # Isolate tests into separate dataframes
     test_results = dict()
     for i, row in df.iterrows():
+        if sum(df["task"].str.count(row["task"])) < 20: # Remove tests with low test numbers
+            continue
         if test_results.get(row["task"]): # Somewhat bad assumption because of potentially flawed data: model has only one best score 
             test_results[row["task"]][row["model"]] = row["Best score (across scorers)"] 
         else:
@@ -51,6 +56,8 @@ def main() -> None:
     
     average_test_scores = dict()
     for model in preproc_test_scores:
+        if preproc_test_scores[model][1] < LOW_TEST_THRES: # Remove models with low test counts
+            continue
         average_test_scores[model] = preproc_test_scores[model][0] / preproc_test_scores[model][1]
     
     result = sorted(average_test_scores, key=average_test_scores.get, reverse=True)
