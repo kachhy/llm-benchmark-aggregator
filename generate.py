@@ -7,6 +7,13 @@ import sys
 LOW_RUN_THRES  = 20 # The minimum number of test runs a test can be used for
 LOW_TEST_THRES = 4 # The minimum number of test cases a model must have to be included
 
+# TASK  - the test that's run
+# MODEL - the model being evaluated
+# SCORE - the higher->better score achieved by the model
+TASK  = "task"
+MODEL = "model"
+SCORE = "Best score (across scorers)"
+
 def main() -> None:
     if len(sys.argv) < 2:
         print("Usage: python3 generate.py <input CSV>")
@@ -16,13 +23,13 @@ def main() -> None:
     
     # Isolate tests into separate dataframes
     test_results = dict()
-    for i, row in df.iterrows():
-        if sum(df["task"].str.count(row["task"])) < 20: # Remove tests with low test numbers
+    for _, row in df.iterrows():
+        if sum(df[TASK].str.count(row[TASK])) < 20: # Remove tests with low test numbers
             continue
-        if test_results.get(row["task"]): # Somewhat bad assumption because of potentially flawed data: model has only one best score 
-            test_results[row["task"]][row["model"]] = row["Best score (across scorers)"] 
+        if test_results.get(row[TASK]): # Somewhat bad assumption because of potentially flawed data: model has only one best score 
+            test_results[row[TASK]][row[MODEL]] = row[SCORE] 
         else:
-            test_results[row["task"]] = {row["model"] : row["Best score (across scorers)"]}
+            test_results[row[TASK]] = {row[MODEL] : row[SCORE]}
 
     # Process test scores
     test_scores = dict()
