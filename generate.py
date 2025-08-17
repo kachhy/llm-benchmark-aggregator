@@ -24,7 +24,7 @@ def main() -> None:
     # Isolate tests into separate dataframes
     test_results = dict()
     for _, row in df.iterrows():
-        if sum(df[TASK].str.count(row[TASK])) < 20: # Remove tests with low test numbers
+        if sum(df[TASK].str.count(row[TASK])) < LOW_RUN_THRES: # Remove tests with low test run numbers
             continue
         if test_results.get(row[TASK]): # Somewhat bad assumption because of potentially flawed data: model has only one best score 
             test_results[row[TASK]][row[MODEL]] = row[SCORE] 
@@ -69,9 +69,16 @@ def main() -> None:
     
     result = sorted(average_test_scores, key=average_test_scores.get, reverse=True)
 
+    csv_out = "Model,Score\n"
     for model in result:
         ats = round(average_test_scores[model] * 100, 1)
-        print(f'{model:<38} {ats:<3}')
+        print(f"{model:<38} {ats:<3}")
+        csv_out += f"{model},{ats}\n"
+
+    with open("out.csv", 'w') as f:
+        f.write(csv_out)
+        f.close()
+    
 
 if __name__ == "__main__":
     main()
